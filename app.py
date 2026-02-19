@@ -18,7 +18,15 @@ pipe = None
 def get_pipe():
     global pipe
     if pipe is None:
-        pipe = pipeline("text-generation", model="google/flan-t5-small")
+        last_error = None
+        for task in ("text2text-generation", "text-generation"):
+            try:
+                pipe = pipeline(task, model="google/flan-t5-small")
+                break
+            except Exception as exc:
+                last_error = exc
+        if pipe is None:
+            raise RuntimeError(f"Could not initialize pipeline: {last_error}")
     return pipe
 
 
@@ -27,6 +35,7 @@ def get_pipe():
 def home():
     with open("frontend.html", "r", encoding="utf-8") as f:
         return Response(content=f.read(), media_type="text/html")
+
 
 @app.get("/generate")
 def generate_text(prompt: str):

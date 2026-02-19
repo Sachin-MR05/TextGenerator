@@ -24,8 +24,7 @@
         <div class="result" id="result"></div>
     </div>
     <script>
-        const host = window.location.hostname || 'localhost';
-        const API_BASE = window.location.port === '7860' ? '' : `http://${host}:7860`;
+        const API_BASE = window.API_BASE || '';
 
         document.getElementById('genForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -46,7 +45,7 @@
 
                 document.getElementById('result').textContent = payload.generated_text || 'No result.';
             } catch (err) {
-                document.getElementById('result').textContent = `Error: ${err.message || err} (API: ${API_BASE || window.location.origin})`;
+                document.getElementById('result').textContent = `Error: ${err.message || err}`;
             }
         });
     </script>
