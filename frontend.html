@@ -24,16 +24,29 @@
         <div class="result" id="result"></div>
     </div>
     <script>
+        const host = window.location.hostname || 'localhost';
+        const API_BASE = window.location.port === '7860' ? '' : `http://${host}:7860`;
+
         document.getElementById('genForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const prompt = document.getElementById('prompt').value;
             document.getElementById('result').textContent = 'Generating...';
             try {
-                const res = await fetch(`/generate?prompt=${encodeURIComponent(prompt)}`);
-                const data = await res.json();
-                document.getElementById('result').textContent = data.generated_text || 'No result.';
+                const res = await fetch(`${API_BASE}/generate?prompt=${encodeURIComponent(prompt)}`);
+                const contentType = res.headers.get('content-type') || '';
+                const isJson = contentType.includes('application/json');
+                const payload = isJson ? await res.json() : await res.text();
+
+                if (!res.ok) {
+                    const errorMessage = isJson
+                        ? (payload.detail || JSON.stringify(payload))
+                        : String(payload);
+                    throw new Error(errorMessage || `Request failed with status ${res.status}`);
+                }
+
+                document.getElementById('result').textContent = payload.generated_text || 'No result.';
             } catch (err) {
-                document.getElementById('result').textContent = 'Error: ' + err;
+                document.getElementById('result').textContent = `Error: ${err.message || err} (API: ${API_BASE || window.location.origin})`;
             }
         });
     </script>
