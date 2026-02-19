@@ -1,6 +1,6 @@
-fastapi
-requests
-pytest
-uvicorn[standard]
-torch
-transformers
+fastapi==0.103.0
+requests==2.31.0
+pytest==7.4.0
+uvicorn[standard]==0.23.0
+torch==2.0.1
+transformers==4.31.0
